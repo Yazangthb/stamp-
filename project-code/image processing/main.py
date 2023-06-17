@@ -3,20 +3,21 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
+from PIL import Image
 # Read and display the image
-
-imgFile = "C:\\Users\\Yazan\\Downloads\\stamp.jpg"
+link="C:\\Users\\Yazan\\Downloads\\stamp.jpg"
+imgFile = link
 img = cv2.imread(imgFile)
 
-
-def imshow(img, showAxis=False, size=(20, 10)):
+im=Image.open(link)
+im.show()
+def imshow(img, showAxis=False, size=(25, 15)):
     plt.figure(figsize=size)
     if not showAxis: plt.axis('off')
     if len(img.shape) == 3:
         plt.imshow(img[:, :, ::-1])
     else:
-        plt.imshow(img, cmap='gray')
+        plt.imshow(img, cmap='Accent')
 
 
 imshow(img)
@@ -30,7 +31,7 @@ gray = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2GRAY)
 blur = cv2.bilateralFilter(gray.copy(), 15, 15, 15 )
 
 # Find edges using canny edge detector
-def auto_canny(grayim, sigma=0.33):
+def auto_canny(grayim, sigma=0.34):
     # compute the median of the single channel pixel intensities
     v = np.median(grayim)
     # apply automatic Canny edge detection using the computed median
@@ -48,7 +49,7 @@ imshow(edged)
 
 # detect the contours on the binary image
 contours, _ = cv2.findContours(image=edged.copy(), mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_NONE)
-print(f'Total nr of contours found: {len(contours)}')
+print(f'Number of contours found: {len(contours)}')
 
 # Sort Contours by Area and get topN
 topN = 10
@@ -99,5 +100,5 @@ for y, x in product(range(img.shape[0]), range(img.shape[1])):
             # Replace the image with the output image
             highlight_blur[y, x, :] = out[y, x, :]
 
-cv2.imshow('image',highlight_blur)
+cv2.imshow(link,highlight_blur)
 cv2.waitKey(0)
