@@ -1,25 +1,30 @@
 # Stamp classification
 
 ## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+We provide stamp detection, classification and comparison using Computer Vision.
+The user only needs to upload the document scans.
 
 ## Methodology
+- **Data augmentation**. We create our own dataset of documents with stamps, based on the datasets we found online and our own scans.
+- **Stamp detection**. We detect stamp(s) on the given image (of a document) and its location (coordinates on the document) using image processing.
+- **Stamp embedding**. We create stamp embeddings from an image of the stamp, using a fine-tuned EfficientNetB0 model.
+- **Classification**. From the embeddings, we calculate the distance between them (cosine similarity) and provide classification.
 
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Usage of the API
+- POST    /auth/sign_in/email - allows the user to sign in with email and password.
+- POST    /auth/login/google - allows the user to sign in using their google account.
+- POST    /auth/login/email - allows the user to login in with email and password.
+- POST    /images/upload - allows the user to upload image(s) that they want to detect and classify the stamps on.
+    - Input - scans of documents in an image format.
+    - Output - [{stamp_name, stamp_picture, accuracy}, …]
+- POST    /feedback/add_stamps - allows the user to add new stamps to the database.
+    - Input - [{stamp_name, stamp_picture}, …]
+- POST    /feedback/report - allows the user to report any possible errors or classification problems.
+    - Input - text and an image (optional).
+- POST    /images/compare - allows the user to compare two images of the stamps in order to check validity.
+    - Input - 2 scans of documents in an image format.
+    - Output - similarity score.
+- GET     /help - returns instructructions on how to use the API.
 
 ## References:
 
@@ -30,6 +35,8 @@ Articles:
 
 Code:
 - [Original EfficientNet GitHub](https://github.com/qubvel/efficientnet)
+- [EfficientNet Tutorial GitHub](https://github.com/rom1504/image_embeddings)
+
 Data:
 - [Stamp verification dataset](https://www.kaggle.com/datasets/rtatman/stamp-verification-staver-dataset)
 - [Stamps dataset](https://www.kaggle.com/datasets/weisinx7/stamps-dataset)
