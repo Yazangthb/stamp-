@@ -4,10 +4,9 @@
 Our project offers a solution for stamp detection, classification, and comparison using Maching learning and Computer Vision techniques. The primary goal is to facilitate the identification and analysis of stamps present in document scans.
 
 ## Authors and acknowledgment
-- Laith Nayal: Computer vision
-- Osama Orabi: ML engineer, datascience
-- Yazan Alnakri: Computer vision
-
+- Yazan Alnakri: Image processing, data augmentation, API design
+- Laith Nayal: Image processing, data augmentation, API design
+- Osama Orabi: ML engineer, data scientist, cleaning data.
 ## Demo
 ### Classify the stamp on the image
 - ![Request](https://drive.google.com/file/d/11BNO1TdvKf4hVhaczPbF38tG8mK1rkmC/view?usp=drive_link)
