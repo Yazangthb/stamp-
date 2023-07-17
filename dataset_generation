@@ -1,0 +1,145 @@
+import os.path
+import cv2
+import numpy as np
+import glob
+import random
+import re
+
+def remove_random_pixels(image, num, how_many=350):
+    """
+    Remove random pixels from the image.
+
+    Args:
+        image (numpy.ndarray): Input image.
+        num (int): Number of levels of darkness.
+        how_many (int, optional): Number of pixels to remove. Defaults to 350.
+
+    Returns:
+        numpy.ndarray: Image with random pixels removed.
+    """
+    height, width = image.shape
+    num_pixels = how_many * num  # Randomly choose the number of pixels to remove
+
+    for _ in range(num_pixels):
+        x = random.randint(0, width - 1)  # Random x-coordinate
+        y = random.randint(0, height - 1)  # Random y-coordinate
+        image[y, x] = 255  # Set the pixel at (x, y) to white (255)
+
+    return image
+
+
+def insert_stamps(stamps_folder, documents_folder, output_folder, threshold, scale_factor):
+    """
+    Insert stamps into document images.
+
+    Args:
+        stamps_folder (str): Path to the folder containing stamp images.
+        documents_folder (str): Path to the folder containing document images.
+        output_folder (str): Path to the output folder to save the modified images.
+        threshold (int): Threshold for black color (0-255 range).
+        scale_factor (float): Scale factor for resizing the stamp image.
+
+    Returns:
+        list: List of coordinates where stamps were inserted.
+    """
+    # Get the list of stamp image paths
+    # Before the loop starts, create an empty list to store the coordinates
+    stamp_coordinates = []
+    stamp_paths = glob.glob(stamps_folder + "/*.png")
+    stamp_paths = sorted(stamp_paths, key=lambda x: (len(x), x))
+
+    # Get the list of document image paths
+    document_paths = glob.glob(documents_folder + "/*.jpg")
+    document_paths = sorted(document_paths, key=lambda x: (len(x), x))
+
+    doc_number = 0
+
+    # Iterate over each document image
+    for doc_num, document_path in enumerate(document_paths):
+        # Load the document image
+        document_img = cv2.imread(document_path, cv2.IMREAD_GRAYSCALE)
+
+        for darknes in range(3):
+            random_background_darkness = random.randint(0, 70)
+            document_img = np.where(document_img < 50, random_background_darkness, document_img)
+
+            # Get the dimensions of the document image
+            doc_height, doc_width = document_img.shape
+            stamp_num = "osama"
+
+            # Iterate over each stamp image
+            for stamp_path in stamp_paths:
+                # stamp_path = random.choice(stamp_paths)
+                stamp_num = os.path.basename(stamp_path)
+                stamp_num = stamp_num[0:-4]
+                print(stamp_num)
+
+                # Load the stamp image
+                stamp_img = cv2.imread(stamp_path, cv2.IMREAD_GRAYSCALE)
+                stamp_img = np.where(stamp_img < 50, darknes * 50, stamp_img)
+
+                # Resize the stamp image
+                resized_stamp = cv2.resize(stamp_img, None, fx=scale_factor, fy=scale_factor)
+
+                # Iterate over different rotations (0 to 360 degrees)
+                iter = 0
+                for angle in range(0, 300, 60):
+                    angle = random.randint(angle - 60, angle + 60)
+
+                    # Rotate the stamp image with border fill
+                    rotation_matrix = cv2.getRotationMatrix2D((resized_stamp.shape[1] // 2, resized_stamp.shape[0] // 2), angle, 1)
+                    rotated_stamp = cv2.warpAffine(resized_stamp, rotation_matrix, (resized_stamp.shape[1], resized_stamp.shape[0]), borderMode=cv2.BORDER_CONSTANT, borderValue=(255))
+
+                    for level_of_noise in range(4):
+                        rotated_stamp = remove_random_pixels(rotated_stamp, level_of_noise, 600)
+
+                        # Find the black pixels in the rotated stamp image
+                        black_pixels = (rotated_stamp < threshold)
+
+                        # Iterate over 20 different positions within the document image
+                        for _ in range(10):
+                            # Randomly select x, y coordinates for stamp insertion
+                            x = random.randint(0, doc_width - rotated_stamp.shape[1])
+                            y = random.randint(0, doc_height - rotated_stamp.shape[0])
+
+                            # Create a copy of the document image
+                            result_img = document_img.copy()
+
+                            # Get the coordinates to insert the stamp image
+                            y_start, y_end = y, y + rotated_stamp.shape[0]
+                            x_start, x_end = x, x + rotated_stamp.shape[1]
+
+                            # Replace the pixels in the document image with the black pixels from the rotated stamp
+                            result_img[y_start:y_end, x_start:x_end][black_pixels] = 0
+
+                            # Save the modified image with a descriptive name
+                            output_name = output_folder + r"/x/stamp{}_angle{}_doc{}_pos{}_noise{}_sdarkness{}_bdarkness{}_doc{}.png".format(stamp_num, angle, doc_num, _, level_of_noise, darknes, random_background_darkness, doc_number)
+                            cv2.imwrite(output_name, result_img)
+
+                            # Extract the area with the stamp from the final image
+                            stamp_area = result_img[y_start:y_end, x_start:x_end]
+
+                            # Save the extracted area with the stamp
+                            extracted_name = output_folder + r"/y/stamp{}_angle{}_doc{}_pos{}_noise{}_sdarkness{}_bdarkness{}_doc{}.png".format(stamp_num, angle, doc_num, _, level_of_noise, darknes, random_background_darkness, doc_number)
+                            cv2.imwrite(extracted_name, stamp_area)
+
+                            doc_number += 1
+                            print(extracted_name, x_start, y_start, x_end, y_end)
+                            stamp_coordinates.append((x_start, y_start, x_end, y_end))
+
+    return stamp_coordinates
+
+
+# Specify the folder paths
+stamps_folder = r"/content/drive/MyDrive/New_images"
+documents_folder = r"/content/drive/MyDrive/docs"
+output_folder = r"/content"
+
+# Specify the threshold for black color (0-255 range)
+threshold = 150
+
+# Specify the scale factor for resizing the stamp image
+scale_factor = 0.3
+
+# Call the function
+list_of_coordinates = insert_stamps(stamps_folder, documents_folder, output_folder, threshold, scale_factor)
