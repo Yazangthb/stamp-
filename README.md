@@ -1,43 +1,62 @@
-# Stamp classification
+# Stamp recognition
 
-## Description
-We provide stamp detection, classification and comparison using Computer Vision.
-The user only needs to upload the document scans.
+## Project Description
+Our project offers a solution for stamp detection, classification, and comparison using Maching learning and Computer Vision techniques. The primary goal is to facilitate the identification and analysis of stamps present in document scans.
 
-## Methodology
-- **Data augmentation**. We create our own dataset of documents with stamps, based on the datasets we found online and our own scans.
-- **Stamp detection**. We detect stamp(s) on the given image (of a document) and its location (coordinates on the document) using image processing.
-- **Stamp embedding**. We create stamp embeddings from an image of the stamp, using a fine-tuned EfficientNetB0 model.
-- **Classification**. From the embeddings, we calculate the distance between them (cosine similarity) and provide classification.
+## Authors and acknowledgment
+- Laith Nayal: Computer vision
+- Osama Orabi: ML engineer, datascience
+- Yazan Alnakri: Computer vision
 
-## Usage of the API
-- POST    /auth/sign_in/email - allows the user to sign in with email and password.
-- POST    /auth/login/google - allows the user to sign in using their google account.
-- POST    /auth/login/email - allows the user to login in with email and password.
-- POST    /images/upload - allows the user to upload image(s) that they want to detect and classify the stamps on.
-    - Input - scans of documents in an image format.
+## Demo
+### Classify the stamp on the image
+- ![Request](https://drive.google.com/file/d/11BNO1TdvKf4hVhaczPbF38tG8mK1rkmC/view?usp=drive_link)
+- ![Good response](https://drive.google.com/file/d/1gidMT8Ohe04btB_s1zTkC3ynDJZ4kwL3/view?usp=drive_link)
+- ![Response with errors:](https://drive.google.com/file/d/1iBvDWP606L1fo8l4DhSpGclE4i_1qanc/view?usp=drive_link)
+### Add new stamp to the database
+- ![Request](https://drive.google.com/file/d/15gpQR2Ytj8OPzcApF_1U6TOre-UZe4wG/view?usp=drive_link)
+- ![Response](https://drive.google.com/file/d/1Z8gMqiPFSar0Cf3yB8PTDBy7X3GEwZdz/view?usp=drive_link)
+
+## How to use
+- POST    /images/upload - allows the user to upload images that they want to detect and classify the stamps on.
+    - Input - scans of document in an image format (png, jpg) and the names for the corresponding stamps.
     - Output - [{stamp_name, stamp_picture, accuracy}, …]
-- POST    /feedback/add_stamps - allows the user to add new stamps to the database.
-    - Input - [{stamp_name, stamp_picture}, …]
-- POST    /feedback/report - allows the user to report any possible errors or classification problems.
-    - Input - text and an image (optional).
-- POST    /images/compare - allows the user to compare two images of the stamps in order to check validity.
-    - Input - 2 scans of documents in an image format.
-    - Output - similarity score.
-- GET     /help - returns instructructions on how to use the API.
+- POST    /images/add_stamp - allows the user to add new stamps to the database.
+    - Input - {[stamp_name1, stamp_name2, ...], document_picture}
+- Requests that will be added soon
+    - POST    /images/compare - allows the user to compare two images of the stamps in order to check validity.
+        - Input - 2 scans of documents in an image format.
+        - Output - similarity score.
+    - GET     /help - returns instructructions on how to use the API.
 
-## References:
+## Features
 
-Articles:
-- [EfficientNet: Improving Accuracy and Efficiency through AutoML and Model Scaling](https://ai.googleblog.com/2019/05/efficientnet-improving-accuracy-and.html)
-- [Image classification via fine-tuning with EfficientNet](https://keras.io/examples/vision/image_classification_efficientnet_fine_tuning/#transfer-learning-from-pretrained-weights)
+Our project offers the following key features, divided into four parts:
 
+### 1. Data Augmentation
 
-Code:
-- [Original EfficientNet GitHub](https://github.com/qubvel/efficientnet)
-- [EfficientNet Tutorial GitHub](https://github.com/rom1504/image_embeddings)
+- **Creation of a dataset**: We generate a comprehensive dataset of documents with stamps by combining real documents with stamps generated with Stable Diffusion.
 
-Data:
-- [Stamp verification dataset](https://www.kaggle.com/datasets/rtatman/stamp-verification-staver-dataset)
-- [Stamps dataset](https://www.kaggle.com/datasets/weisinx7/stamps-dataset)
-- [Noisy documents datase](https://www.kaggle.com/datasets/sthabile/noisy-and-rotated-scanned-documents)
+### 2. Stamp Detection
+
+- **Detection**: Our system identifies stamp(s) present in document images using advanced image processing techniques.
+- **Location determination**: We precisely locate the detected stamp(s) on the document, providing their coordinates.
+
+### 3. Stamp Embedding
+
+- **Feature extraction**: We utilize out own CNN model to generate embeddings from stamp images.
+- **Vectorization of stamps**: The embeddings represent stamps as high-dimensional vectors, capturing their unique characteristics.
+
+### 4. Classification
+
+- **Distance calculation**: From the embeddings, we calculate the cosine similarity to measure the similarity between stamps.
+- **Classification**: Based on the calculated distances, our system provides reliable classification results for stamps.
+
+## Technologies used
+- Backend: Python, SQLight, Flask, Pydantic, Werkzeug, unit-testing
+- Detection: Edge detection, Bluring, Python, cv2, matplotlib, numpy
+- Embeddings: CNN, Image preprocessing, Python, tensorflow, numpy, scipy, matplotlib
+- Dataset augmentation: Stable diffusion, Photoshop, Blender, Python
+
+## Badges
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
