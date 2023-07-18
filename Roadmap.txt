@@ -1,0 +1,7 @@
+DenseNet121:
+OCR: 
+CNN Model for embeddings:
+Mathematical ways to extract the stamp (convex hull and Alpha shape):
+Edge detection for grayscale images:
+Backlog in Trello:
+EfficientNet model:
